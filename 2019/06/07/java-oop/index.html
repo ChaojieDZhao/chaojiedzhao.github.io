@@ -1,0 +1,190 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>java OOP | 喊你帕木</title><meta name="author" content="HnPham"><meta name="copyright" content="HnPham"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="类和类之间的关系，耦合度从高到低is - 继承、实现 has - 组合、聚合、关联 use - 依赖。 依赖关系(Dependency)单向，表示一个类依赖于另一个类的定义，其中一个类的变化将影响另外一个类，是一种“use a”关系!如果A依赖于B，则B表现为A的局部变量，方法参数，静态方法调用等 12345678910111213public class Person &#123;      p">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java OOP">
+<meta property="og:url" content="http://example.com/2019/06/07/java-oop/index.html">
+<meta property="og:site_name" content="喊你帕木">
+<meta property="og:description" content="类和类之间的关系，耦合度从高到低is - 继承、实现 has - 组合、聚合、关联 use - 依赖。 依赖关系(Dependency)单向，表示一个类依赖于另一个类的定义，其中一个类的变化将影响另外一个类，是一种“use a”关系!如果A依赖于B，则B表现为A的局部变量，方法参数，静态方法调用等 12345678910111213public class Person &#123;      p">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/hnpham_icon.jpg">
+<meta property="article:published_time" content="2019-06-07T01:07:21.000Z">
+<meta property="article:modified_time" content="2025-06-09T01:59:01.130Z">
+<meta property="article:author" content="HnPham">
+<meta property="article:tag" content="java">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/hnpham_icon.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "java OOP",
+  "url": "http://example.com/2019/06/07/java-oop/",
+  "image": "http://example.com/img/hnpham_icon.jpg",
+  "datePublished": "2019-06-07T01:07:21.000Z",
+  "dateModified": "2025-06-09T01:59:01.130Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "HnPham",
+      "url": "http://example.com"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/2019/06/07/java-oop/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":true,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'java OOP',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">喊你帕木</span></a><a class="nav-page-title" href="/"><span class="site-name">java OOP</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">java OOP</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="fa-fw post-meta-icon far fa-calendar-alt"></i><span class="post-meta-label">发表于</span><time datetime="2019-06-07T01:07:21.000Z" title="发表于 2019-06-07 09:07:21">2019-06-07</time></span></div><div class="meta-secondline"></div></div></div><article class="container post-content" id="article-container"><h2 id="类和类之间的关系，耦合度从高到低"><a href="#类和类之间的关系，耦合度从高到低" class="headerlink" title="类和类之间的关系，耦合度从高到低"></a>类和类之间的关系，耦合度从高到低</h2><p>is - 继承、实现</p>
+<p>has - 组合、聚合、关联</p>
+<p>use - 依赖。</p>
+<h3 id="依赖关系-Dependency"><a href="#依赖关系-Dependency" class="headerlink" title="依赖关系(Dependency)"></a>依赖关系(Dependency)</h3><p><strong>单向</strong>，表示一个类依赖于另一个类的定义，其中一个类的变化将影响另外一个类，是一种“use a”关系!如果A依赖于B，则B表现为A的局部变量，方法参数，静态方法调用等</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Person</span> &#123;  </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">doSomething</span><span class="params">()</span>&#123;  </span><br><span class="line">        <span class="type">Card</span> <span class="variable">card</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Card</span>();<span class="comment">//局部变量  </span></span><br><span class="line">        ....  </span><br><span class="line">    &#125; </span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">doSomething</span><span class="params">(Card card)</span>&#123;&#125;   <span class="comment">//方法参数</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">doSomething2</span><span class="params">()</span>&#123;  </span><br><span class="line">            <span class="type">int</span> <span class="variable">id</span> <span class="operator">=</span> Card.getId(); <span class="comment">//静态方法调用  </span></span><br><span class="line">            ...  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<h3 id="关联关系-Association"><a href="#关联关系-Association" class="headerlink" title="关联关系(Association)"></a>关联关系(Association)</h3><p>单向或双向（通常我们需要避免使用双向关联关系），是一种”has a”关系，如果A单向关联B，则可以说A has a B，通常表现为全局变量。</p>
+<blockquote>
+<p>特点是：不是在构造方法中设置的</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Person</span> &#123;  </span><br><span class="line">    <span class="keyword">public</span> Address address;  </span><br><span class="line">      </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setAddress</span> <span class="params">(Address address)</span>&#123;        </span><br><span class="line">        <span class="built_in">this</span>.address= address;  </span><br><span class="line">    &#125;  </span><br><span class="line">      </span><br><span class="line">    <span class="keyword">public</span> Address <span class="title function_">getAddress</span> <span class="params">()</span>&#123;          </span><br><span class="line">        <span class="keyword">return</span> address;  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<p><strong>双关联</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">customer</span> &#123;  </span><br><span class="line">    <span class="keyword">public</span> Product product[]    ;  </span><br><span class="line">&#125;  </span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Product</span> &#123;  </span><br><span class="line">    <span class="keyword">public</span> customer customer[]    ;  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<p><strong>自关联</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Node</span> &#123;  </span><br><span class="line">    <span class="keyword">public</span> Node current    ;  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<h3 id="聚合关系-Aggregation"><a href="#聚合关系-Aggregation" class="headerlink" title="聚合关系(Aggregation)"></a>聚合关系(Aggregation)</h3><blockquote>
+<p>聚合的特点是：有这个属性，且要在构造方法中使用，但不是在构造方法中创建的。<br>注意和组合的差别：两者的创建时机不同，组合是在Person创建的时候，被创建的。聚合是用<strong>构造参数</strong>创建的。</p>
+</blockquote>
+<p>单向，关联关系的一种，与关联关系之间的区别是<strong>语义上</strong>的，关联的两个对象通常是平等的，聚合则一般不平等，有一种整体和局部的感觉，<br>关联的两个对象之间一般是平等的，例如你是我的朋友，聚合则一般不是平等的，例如一个公司包含了很多员工，其实现上是差不多的。实现上区别不大!</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Team</span> &#123;  </span><br><span class="line">    <span class="keyword">public</span> Person person;  </span><br><span class="line">      </span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Team</span><span class="params">(Person person)</span>&#123;  </span><br><span class="line">        <span class="built_in">this</span>.person = person;  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
+
+<h3 id="组合关系-Composition"><a href="#组合关系-Composition" class="headerlink" title="组合关系(Composition)"></a>组合关系(Composition)</h3><p>组合也是关联关系的一种特例，它体现的是一种contains-a的关系，这种关系比聚合更强，也称为强聚合。<br>它同样体现整体与部分间的关系，但此时整体与部分是不可分的，整体的生命周期结束也就意味着部分的生命周期结束，比如人和人的大脑。<br>表现在代码层面，和关联关系是一致的，只能从语义级别来区分。在UML类图设计中，组合关系以实心菱形加实线箭头表示。 </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Person</span> &#123;</span><br><span class="line">    <span class="comment">// Person和Heart之间是组合</span></span><br><span class="line">    <span class="keyword">private</span> Heart h;</span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Person</span><span class="params">()</span>&#123;</span><br><span class="line">        h=<span class="keyword">new</span> <span class="title class_">Heart</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>特征是：<strong>要在构造方法中创建对象</strong></p>
+<h2 id="继承关系-Inheritance"><a href="#继承关系-Inheritance" class="headerlink" title="继承关系(Inheritance)"></a>继承关系(Inheritance)</h2><h2 id="实现（Realization）-类实现接口属于这种关系"><a href="#实现（Realization）-类实现接口属于这种关系" class="headerlink" title="实现（Realization） 类实现接口属于这种关系"></a>实现（Realization） 类实现接口属于这种关系</h2><h2 id="泛化（Generalization）-即”is-a”关系，类继承抽象类，类继承父类都属于这种关系"><a href="#泛化（Generalization）-即”is-a”关系，类继承抽象类，类继承父类都属于这种关系" class="headerlink" title="泛化（Generalization） 即”is a”关系，类继承抽象类，类继承父类都属于这种关系"></a>泛化（Generalization） 即”is a”关系，类继承抽象类，类继承父类都属于这种关系</h2></article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/java/">java</a></div><div class="post-share"><div class="social-share" data-image="/img/hnpham_icon.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2019/08/16/CORS/" title="跨源请求"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">跨源请求</div></div><div class="info-2"><div class="info-item-1"> Cross-Origin Resource Sharing（跨源共享）允许web客户端向不同源的服务器发出http请求，跨源是一种web技术，因为它同时包含客户端和服务端的组件。服务端组件控制那些类型的跨源请求被允许，而客户端组件控制如何发出跨源请求。  什么是origin（源）origin 定义了客户端你的来源。比如http://localhost:1111/client.html的origin就是http://localhost:1111。换句话说除了最后路径部分， 就叫做origin。可以看出origin有几部分组成，协议+主机+端口，null除外。如下所示的几种url和它对应的origin：    URL ORIGIN    http://localhost:1111 http://localhost:1111   https://localhost:1111/client.html https://localhost:1111   file:&#x2F;&#x2F;&#x2F;Users&#x2F;hossain&#x2F;ch02&#x2F;client.html ...</div></div></div></a><a class="pagination-related" href="/2019/06/02/java-generics/" title="java泛型"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">java泛型</div></div><div class="info-2"><div class="info-item-1">字典 type parameter，类型形参。如Collection&lt;Integer&gt;，该声明的类型形参是Integer。 parameterized type，参数化类型。如new Array&lt;Integer&gt;，该调用的参数化类型是Integer。 type variable，类型变量。如类声明public class Canvas&lt;T&gt; ，T就是类型变量。  什么是泛型 泛型是从J2SE 5.0引入的一个增强特性，允许类型和方法操作各种类型的对象同时提供编译时类型的安全性检查。另外也增加了集合编译时类型的安全性检查，消除了之前需强制转换的繁重工作。  123List myIntList = new LinkedList(); // 1myIntList.add(new Integer(0)); // 2Integer x = (Integer) myIntList.iterator().next(); // 3          如上述代码，第3行是很烦人的，通常情况下，开发者知道何种类型的数据会被添加到集合，但是强制转换还是必须的，因为编...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2019/09/28/why-lamda-needs-final/" title="为什么lambda需要final"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2019-09-28</div><div class="info-item-2">为什么lambda需要final</div></div><div class="info-2"><div class="info-item-1"> 如上所示，如果在lambda表达式内部使用注释的代码，则会提示以下错误。  local variables referenced from a lambda expression must be final or effectively final 那么为什么lambda表达式内部引用外部局部变量需要声明为final呢？ lambda可以理解为本来就是一个方法，如右侧所示，本地变量是存储在栈帧的局部变量表的，是私有的。而方法的传参是值传递的，所以在内部遍历中对变量的操作是不会影响到外部局部变量的。 但是语义上来说我们常常把lambda stream和for循环看做一样。其实内部实现是不一样的。lambda可以看做是调用了一个新的方法，而for循环本身就是方法的一部分。 所以既然如此，那java就把外部变量直接声明为final类型，或者effectively final（不会再lambda内部对外部引用变量修改）。这样保证了语义的一致性。 参考链接 </div></div></div></a><a class="pagination-related" href="/2016/06/15/java-aop/" title="java AOP"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2016-06-15</div><div class="info-item-2">java AOP</div></div><div class="info-2"><div class="info-item-1">静态代理众所周知 Spring 的 AOP 是基于动态代理实现的，谈到动态代理就不得不提下静态代理。实现如下： 假设有一接口 InterfaceA： 123public interface InterfaceA&#123;    void exec();&#125;  其中有实现类 RealImplement: 12345public class RealImplement implement InterfaceA&#123;    public void exec()&#123;        System.out.println(&quot;real impl&quot;) ;    &#125;&#125;  这时也有一个代理类 ProxyImplement 也实现了 InterfaceA: 12345678910111213141516public class ProxyImplement implement InterfaceA&#123;    private InterfaceA interface ;        public ProxyImplement()&...</div></div></div></a><a class="pagination-related" href="/2019/06/02/java-generics/" title="java泛型"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2019-06-02</div><div class="info-item-2">java泛型</div></div><div class="info-2"><div class="info-item-1">字典 type parameter，类型形参。如Collection&lt;Integer&gt;，该声明的类型形参是Integer。 parameterized type，参数化类型。如new Array&lt;Integer&gt;，该调用的参数化类型是Integer。 type variable，类型变量。如类声明public class Canvas&lt;T&gt; ，T就是类型变量。  什么是泛型 泛型是从J2SE 5.0引入的一个增强特性，允许类型和方法操作各种类型的对象同时提供编译时类型的安全性检查。另外也增加了集合编译时类型的安全性检查，消除了之前需强制转换的繁重工作。  123List myIntList = new LinkedList(); // 1myIntList.add(new Integer(0)); // 2Integer x = (Integer) myIntList.iterator().next(); // 3          如上述代码，第3行是很烦人的，通常情况下，开发者知道何种类型的数据会被添加到集合，但是强制转换还是必须的，因为编...</div></div></div></a><a class="pagination-related" href="/2018/01/16/java-jvm-threaddump/" title="服务器隐忧排查"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2018-01-16</div><div class="info-item-2">服务器隐忧排查</div></div><div class="info-2"><div class="info-item-1">linux查询耗费进程的pidtop -H 查询该进程的线程占用情况top -H -p $pid或者top -p $pid,shift + h 线程按照CPU排序。 查询线程状态信息jstack $pid |grep $tid(需要转换为十六进制) -A 30 jstack命令记录jstack -l $pidjstack -l -m $pid #to print both java and native frames (mixed mode)，打印java和本地帧。如果调用动态库的话 一定要带上该参数。 ThreadDump文件jstack -l $pid | tee -a $file-path 直接转换十六进制echo ‘obase&#x3D;16; $pid’ | bc 或者  printf “%x\n” $pid 显示内存模型信息jmap -histo:live $pid | head -n 100 统计打印出来的Thread_Infogrep java.lang.Thread.State abnormalThreadInfo.txt | awk ‘{print $2$3$...</div></div></div></a><a class="pagination-related" href="/2016/06/15/java-mybatis-generator-ext/" title="mybatisGenerator的使用"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2016-06-15</div><div class="info-item-2">mybatisGenerator的使用</div></div><div class="info-2"><div class="info-item-1">mybatis generator是很好用的mybatis技术相关的自动代码生成工具。每次建立一张表然后手动写入一个实体类和mapper接口文件还有xml配置文件感觉会很麻烦，使用mybatis generator只需要简单的配置就能完成我们的工作。 展示一个oracle数据库中用到的分页xml12345678910&lt;sql id=&quot;OracleDialectPrefix&quot; &gt;&lt;if test=&quot;page != null&quot; &gt;  select * from ( select row_.*, rownum rownum_ from ( &lt;/if&gt;&lt;/sql&gt;&lt;sql id=&quot;OracleDialectSuffix&quot; &gt;&lt;if test=&quot;page != null&quot; &gt;  &lt;![CDATA[ ) row_ ) where rownum_ &gt; #&#123;page.begin&#125; and rownum_ &lt;=...</div></div></div></a><a class="pagination-related" href="/2017/01/22/java-thread&pool/" title="java线程"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2017-01-22</div><div class="info-item-2">java线程</div></div><div class="info-2"><div class="info-item-1">线程的六种状态:NEW线程刚创建, 尚未启动 RUNNABLE线程正在虚拟机正常运行中, 当然可能会有某种耗时计算&#x2F;IO等待的操作&#x2F;CPU时间片切换等, 这个状态下发生的等待一般是其他系统资源, 而不是锁, Sleep等 BLOCKED这个状态下, 是在多个线程有同步操作的场景, 比如正在等待另一个线程的 synchronized 块的执行释放, 或者可重入的 synchronized 块里别人调用wait() 方法, 也就是这里是线程在等待进入临界区 WAITING这个状态下是指线程拥有了某个锁之后, 调用了他的wait方法, 等待其他线程&#x2F;锁拥有者调用 notify &#x2F; notifyAll 一遍该线程可以继续下一步操作, 这里要区分 BLOCKED 和 WATING 的区别, 一个是在临界点外面等待进入, 一个是在临界点里面wait等待别人notify， 线程调用了另外一个线程（THREAD-OTHER）的join方法, 也会进入WAITING状态, 等待（THREAD-OTHER）的线程执行结束 TIMED_WAITING这个状态就是...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/hnpham_icon.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">HnPham</div><div class="author-info-description"></div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">37</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">21</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">攒了很多东西要买，但是没攒钱。</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B1%BB%E5%92%8C%E7%B1%BB%E4%B9%8B%E9%97%B4%E7%9A%84%E5%85%B3%E7%B3%BB%EF%BC%8C%E8%80%A6%E5%90%88%E5%BA%A6%E4%BB%8E%E9%AB%98%E5%88%B0%E4%BD%8E"><span class="toc-number">1.</span> <span class="toc-text">类和类之间的关系，耦合度从高到低</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BE%9D%E8%B5%96%E5%85%B3%E7%B3%BB-Dependency"><span class="toc-number">1.1.</span> <span class="toc-text">依赖关系(Dependency)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B3%E8%81%94%E5%85%B3%E7%B3%BB-Association"><span class="toc-number">1.2.</span> <span class="toc-text">关联关系(Association)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%81%9A%E5%90%88%E5%85%B3%E7%B3%BB-Aggregation"><span class="toc-number">1.3.</span> <span class="toc-text">聚合关系(Aggregation)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BB%84%E5%90%88%E5%85%B3%E7%B3%BB-Composition"><span class="toc-number">1.4.</span> <span class="toc-text">组合关系(Composition)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%A7%E6%89%BF%E5%85%B3%E7%B3%BB-Inheritance"><span class="toc-number">2.</span> <span class="toc-text">继承关系(Inheritance)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9E%E7%8E%B0%EF%BC%88Realization%EF%BC%89-%E7%B1%BB%E5%AE%9E%E7%8E%B0%E6%8E%A5%E5%8F%A3%E5%B1%9E%E4%BA%8E%E8%BF%99%E7%A7%8D%E5%85%B3%E7%B3%BB"><span class="toc-number">3.</span> <span class="toc-text">实现（Realization） 类实现接口属于这种关系</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B3%9B%E5%8C%96%EF%BC%88Generalization%EF%BC%89-%E5%8D%B3%E2%80%9Dis-a%E2%80%9D%E5%85%B3%E7%B3%BB%EF%BC%8C%E7%B1%BB%E7%BB%A7%E6%89%BF%E6%8A%BD%E8%B1%A1%E7%B1%BB%EF%BC%8C%E7%B1%BB%E7%BB%A7%E6%89%BF%E7%88%B6%E7%B1%BB%E9%83%BD%E5%B1%9E%E4%BA%8E%E8%BF%99%E7%A7%8D%E5%85%B3%E7%B3%BB"><span class="toc-number">4.</span> <span class="toc-text">泛化（Generalization） 即”is a”关系，类继承抽象类，类继承父类都属于这种关系</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/08/24/online-compiler/" title="在线编译器">在线编译器</a><time datetime="2025-08-24T11:43:51.939Z" title="发表于 2025-08-24 19:43:51">2025-08-24</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2019/09/28/why-lamda-needs-final/" title="为什么lambda需要final">为什么lambda需要final</a><time datetime="2019-09-28T09:22:24.000Z" title="发表于 2019-09-28 17:22:24">2019-09-28</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2019/08/16/CORS/" title="跨源请求">跨源请求</a><time datetime="2019-08-16T06:17:53.000Z" title="发表于 2019-08-16 14:17:53">2019-08-16</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2019/06/07/java-oop/" title="java OOP">java OOP</a><time datetime="2019-06-07T01:07:21.000Z" title="发表于 2019-06-07 09:07:21">2019-06-07</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2019/06/02/java-generics/" title="java泛型">java泛型</a><time datetime="2019-06-02T01:07:21.000Z" title="发表于 2019-06-02 09:07:21">2019-06-02</time></div></div></div></div></div></div></main><footer id="footer" style="background: orange;"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2019 - 2025 By HnPham</span></div><div class="footer_custom_text">人最应做的是生活 而非生存</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"></div><canvas class="fireworks" mobile="false"></canvas><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/fireworks.min.js"></script><script defer="defer" id="ribbon" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-ribbon.min.js" size="150" alpha="0.6" zIndex="-1" mobile="false" data-click="false"></script><script defer="defer" id="fluttering_ribbon" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-fluttering-ribbon.min.js"></script></div></body></html>

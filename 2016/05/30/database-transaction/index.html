@@ -1,0 +1,214 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>spring中的事物控制 | 喊你帕木</title><meta name="author" content="HnPham"><meta name="copyright" content="HnPham"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="数据库事务中的ACID原子性（Atomicity）要么做完，要么就不做。如果在执行过程中发生错误，会被回滚（Rollback）到事务开始前的状态，就像这个事务从来没有执行过一样。 一致性（Consistency）一个事务可以封装状态改变（除非它是一个只读的）。事务必须始终保持系统处于一致的状态，不管在任何给定的时间并发事务有多少。如果事务是并发多个，系统也必须如同串行事务一样操作。其主要特征是保护">
+<meta property="og:type" content="article">
+<meta property="og:title" content="spring中的事物控制">
+<meta property="og:url" content="http://example.com/2016/05/30/database-transaction/index.html">
+<meta property="og:site_name" content="喊你帕木">
+<meta property="og:description" content="数据库事务中的ACID原子性（Atomicity）要么做完，要么就不做。如果在执行过程中发生错误，会被回滚（Rollback）到事务开始前的状态，就像这个事务从来没有执行过一样。 一致性（Consistency）一个事务可以封装状态改变（除非它是一个只读的）。事务必须始终保持系统处于一致的状态，不管在任何给定的时间并发事务有多少。如果事务是并发多个，系统也必须如同串行事务一样操作。其主要特征是保护">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/hnpham_icon.jpg">
+<meta property="article:published_time" content="2016-05-30T07:50:53.000Z">
+<meta property="article:modified_time" content="2025-08-24T11:47:41.472Z">
+<meta property="article:author" content="HnPham">
+<meta property="article:tag" content="transaction">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/hnpham_icon.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "spring中的事物控制",
+  "url": "http://example.com/2016/05/30/database-transaction/",
+  "image": "http://example.com/img/hnpham_icon.jpg",
+  "datePublished": "2016-05-30T07:50:53.000Z",
+  "dateModified": "2025-08-24T11:47:41.472Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "HnPham",
+      "url": "http://example.com"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/2016/05/30/database-transaction/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":true,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'spring中的事物控制',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">喊你帕木</span></a><a class="nav-page-title" href="/"><span class="site-name">spring中的事物控制</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">spring中的事物控制</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="fa-fw post-meta-icon far fa-calendar-alt"></i><span class="post-meta-label">发表于</span><time datetime="2016-05-30T07:50:53.000Z" title="发表于 2016-05-30 15:50:53">2016-05-30</time></span></div><div class="meta-secondline"></div></div></div><article class="container post-content" id="article-container"><h2 id="数据库事务中的ACID"><a href="#数据库事务中的ACID" class="headerlink" title="数据库事务中的ACID"></a>数据库事务中的ACID</h2><p><strong>原子性（Atomicity）</strong><br>要么做完，要么就不做。如果在执行过程中发生错误，会被回滚（Rollback）到事务开始前的状态，就像这个事务从来没有执行过一样。</p>
+<p><strong>一致性（Consistency）</strong><br>一个事务可以封装状态改变（除非它是一个只读的）。事务必须始终保持系统处于一致的状态，不管在任何给定的时间并发事务有多少。<br>如果事务是并发多个，系统也必须如同串行事务一样操作。其主要特征是保护性和不变性(Preserving an Invariant)，以转账案例为例，假设有五个账户，每个账户余额是100元，那么五个账户总额是500元，如果在这个5个账户之间同时发生多个转账，无论并发多少个，比如在A与B账户之间转账5元，在C与D账户之间转账10元，在B与E之间转账15元，五个账户总额也应该还是500元，这就是保护性和不变性。</p>
+<p><strong>隔离性（Isolation）</strong><br>隔离状态执行事务，使它们好像是系统在给定时间内执行的唯一操作。如果有两个事务，运行在相同的时间内，执行相同的功能，事务的隔离性将确保每一事务在系统中认为只有该事务在使用系统。这种属性有时称为串行化，为了防止事务操作间的混淆，必须串行化或序列化请求，使得在同一时间仅有一个请求用于同一数据。</p>
+<p><strong>持久性（Durability）</strong><br>在事务完成以后，该事务对数据库所作的更改便持久的保存在数据库之中，并不会被回滚。</p>
+<p>原子性是基础，隔离性是手段，持久性是目的，真正的老大就是一致性</p>
+<h2 id="事务隔离级别（Transaction-Isolation-Level）"><a href="#事务隔离级别（Transaction-Isolation-Level）" class="headerlink" title="事务隔离级别（Transaction Isolation Level）"></a>事务隔离级别（Transaction Isolation Level）</h2><blockquote>
+<p>READ_UNCOMMITTED<br>READ_COMMITTED<br>REPEATABLE_READ<br>SERIALIZABLE</p>
+</blockquote>
+<h2 id="数据库的一般性事务问题"><a href="#数据库的一般性事务问题" class="headerlink" title="数据库的一般性事务问题"></a>数据库的一般性事务问题</h2><blockquote>
+<p>Dirty Read（脏读） （针对未提交数据）如果一个事务中对数据进行了更新，但事务还没有提交，<br>另一个事务可以“看到”该事务没有提交的更新结果，这样造成的问题就是，如果第一个事务回滚，那么，第二个事务在此之前所“看到”的数据就是一笔脏数据。</p>
+</blockquote>
+<blockquote>
+<p>Unrepeatable Read（不可重复读） 不可重复读取是指同一个事务在整个事务过程中对同一笔数据进行读取，每次读取结果都不同。如果事务1在事务2的更新操作之前读取一次数据，<br>在事务2的更新操作之后再读取同一笔数据一次，两次结果是不同的，所以，Read Uncommitted也无法避免不可重复读取的问题。</p>
+</blockquote>
+<blockquote>
+<p>Phantom Read（幻影读） 幻读是指同样一笔查询在整个事务过程中多次执行后，查询所得的结果集是不一样的。幻读针对的是多笔记录。在Read Uncommitted隔离级别下，<br>不管事务2的插入操作是否提交，事务1在插入操作之前和之后执行相同的查询，取得的结果集是不同的，所以，Read Uncommitted同样无法避免幻读的问题。</p>
+</blockquote>
+<h2 id="事物问题和隔离级别之间的关系"><a href="#事物问题和隔离级别之间的关系" class="headerlink" title="事物问题和隔离级别之间的关系"></a>事物问题和隔离级别之间的关系</h2><table>
+<thead>
+<tr>
+<th>事务隔离级别</th>
+<th align="center">脏读</th>
+<th align="center">不可重复读</th>
+<th align="center">幻影读</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>READ_UNCOMMITTED</td>
+<td align="center">允许</td>
+<td align="center">允许</td>
+<td align="center">允许</td>
+</tr>
+<tr>
+<td>READ_COMMITTED</td>
+<td align="center">禁止</td>
+<td align="center">允许</td>
+<td align="center">允许</td>
+</tr>
+<tr>
+<td>REPEATABLE_READ</td>
+<td align="center">禁止</td>
+<td align="center">禁止</td>
+<td align="center">允许</td>
+</tr>
+<tr>
+<td>SERIALIZABLE</td>
+<td align="center">禁止</td>
+<td align="center">禁止</td>
+<td align="center">禁止</td>
+</tr>
+</tbody></table>
+<p>一个不错的demo地址：  <a target="_blank" rel="noopener" href="https://gitee.com/Zalldios/spring-bucket-demo/tree/master/spring-bucket/spring-boot">spring-boot-sample-transaction</a></p>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/transaction/">transaction</a></div><div class="post-share"><div class="social-share" data-image="/img/hnpham_icon.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2016/06/15/java-aop/" title="java AOP"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">java AOP</div></div><div class="info-2"><div class="info-item-1">静态代理众所周知 Spring 的 AOP 是基于动态代理实现的，谈到动态代理就不得不提下静态代理。实现如下： 假设有一接口 InterfaceA： 123public interface InterfaceA&#123;    void exec();&#125;  其中有实现类 RealImplement: 12345public class RealImplement implement InterfaceA&#123;    public void exec()&#123;        System.out.println(&quot;real impl&quot;) ;    &#125;&#125;  这时也有一个代理类 ProxyImplement 也实现了 InterfaceA: 12345678910111213141516public class ProxyImplement implement InterfaceA&#123;    private InterfaceA interface ;        public ProxyImplement()&...</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/hnpham_icon.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">HnPham</div><div class="author-info-description"></div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">37</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">21</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">攒了很多东西要买，但是没攒钱。</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BA%8B%E5%8A%A1%E4%B8%AD%E7%9A%84ACID"><span class="toc-number">1.</span> <span class="toc-text">数据库事务中的ACID</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8B%E5%8A%A1%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB%EF%BC%88Transaction-Isolation-Level%EF%BC%89"><span class="toc-number">2.</span> <span class="toc-text">事务隔离级别（Transaction Isolation Level）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E4%B8%80%E8%88%AC%E6%80%A7%E4%BA%8B%E5%8A%A1%E9%97%AE%E9%A2%98"><span class="toc-number">3.</span> <span class="toc-text">数据库的一般性事务问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8B%E7%89%A9%E9%97%AE%E9%A2%98%E5%92%8C%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB%E4%B9%8B%E9%97%B4%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="toc-number">4.</span> <span class="toc-text">事物问题和隔离级别之间的关系</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/08/24/online-compiler/" title="在线编译器">在线编译器</a><time datetime="2025-08-24T11:43:51.939Z" title="发表于 2025-08-24 19:43:51">2025-08-24</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2019/09/28/why-lamda-needs-final/" title="为什么lambda需要final">为什么lambda需要final</a><time datetime="2019-09-28T09:22:24.000Z" title="发表于 2019-09-28 17:22:24">2019-09-28</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2019/08/16/CORS/" title="跨源请求">跨源请求</a><time datetime="2019-08-16T06:17:53.000Z" title="发表于 2019-08-16 14:17:53">2019-08-16</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2019/06/07/java-oop/" title="java OOP">java OOP</a><time datetime="2019-06-07T01:07:21.000Z" title="发表于 2019-06-07 09:07:21">2019-06-07</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2019/06/02/java-generics/" title="java泛型">java泛型</a><time datetime="2019-06-02T01:07:21.000Z" title="发表于 2019-06-02 09:07:21">2019-06-02</time></div></div></div></div></div></div></main><footer id="footer" style="background: orange;"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2019 - 2025 By HnPham</span></div><div class="footer_custom_text">人最应做的是生活 而非生存</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"></div><canvas class="fireworks" mobile="false"></canvas><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/fireworks.min.js"></script><script defer="defer" id="ribbon" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-ribbon.min.js" size="150" alpha="0.6" zIndex="-1" mobile="false" data-click="false"></script><script defer="defer" id="fluttering_ribbon" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-fluttering-ribbon.min.js"></script></div></body></html>

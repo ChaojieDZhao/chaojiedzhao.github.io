@@ -1,0 +1,266 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>redis使用 | 喊你帕木</title><meta name="author" content="HnPham"><meta name="copyright" content="HnPham"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="集群搭建第一步：创建一个文件夹redis-cluster，然后在其下面分别创建6个文件夹如下： mkdir -p &#x2F;usr&#x2F;local&#x2F;redis-cluster     mkdir 7001、mkdir 7002、mkdir 7003、mkdir 7004、mkdir 7005、mkdir 7006  第二步：把之前的redis.conf配置文件分别copy到700">
+<meta property="og:type" content="article">
+<meta property="og:title" content="redis使用">
+<meta property="og:url" content="http://example.com/2017/08/17/usage-redis/index.html">
+<meta property="og:site_name" content="喊你帕木">
+<meta property="og:description" content="集群搭建第一步：创建一个文件夹redis-cluster，然后在其下面分别创建6个文件夹如下： mkdir -p &#x2F;usr&#x2F;local&#x2F;redis-cluster     mkdir 7001、mkdir 7002、mkdir 7003、mkdir 7004、mkdir 7005、mkdir 7006  第二步：把之前的redis.conf配置文件分别copy到700">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/hnpham_icon.jpg">
+<meta property="article:published_time" content="2017-08-17T12:01:36.000Z">
+<meta property="article:modified_time" content="2025-06-05T07:34:34.097Z">
+<meta property="article:author" content="HnPham">
+<meta property="article:tag" content="redis">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/hnpham_icon.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "redis使用",
+  "url": "http://example.com/2017/08/17/usage-redis/",
+  "image": "http://example.com/img/hnpham_icon.jpg",
+  "datePublished": "2017-08-17T12:01:36.000Z",
+  "dateModified": "2025-06-05T07:34:34.097Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "HnPham",
+      "url": "http://example.com"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/2017/08/17/usage-redis/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":true,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'redis使用',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">喊你帕木</span></a><a class="nav-page-title" href="/"><span class="site-name">redis使用</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">redis使用</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="fa-fw post-meta-icon far fa-calendar-alt"></i><span class="post-meta-label">发表于</span><time datetime="2017-08-17T12:01:36.000Z" title="发表于 2017-08-17 20:01:36">2017-08-17</time></span></div><div class="meta-secondline"></div></div></div><article class="container post-content" id="article-container"><h2 id="集群搭建"><a href="#集群搭建" class="headerlink" title="集群搭建"></a>集群搭建</h2><h3 id="第一步：创建一个文件夹redis-cluster，然后在其下面分别创建6个文件夹如下："><a href="#第一步：创建一个文件夹redis-cluster，然后在其下面分别创建6个文件夹如下：" class="headerlink" title="第一步：创建一个文件夹redis-cluster，然后在其下面分别创建6个文件夹如下："></a>第一步：创建一个文件夹redis-cluster，然后在其下面分别创建6个文件夹如下：</h3><ul>
+<li>mkdir -p &#x2F;usr&#x2F;local&#x2F;redis-cluster    </li>
+<li>mkdir 7001、mkdir 7002、mkdir 7003、mkdir 7004、mkdir 7005、mkdir 7006</li>
+</ul>
+<h3 id="第二步：把之前的redis-conf配置文件分别copy到700修改各个文件内容，也就是对700下的每一个copy的redis-conf文件进行修改！如下："><a href="#第二步：把之前的redis-conf配置文件分别copy到700修改各个文件内容，也就是对700下的每一个copy的redis-conf文件进行修改！如下：" class="headerlink" title="第二步：把之前的redis.conf配置文件分别copy到700修改各个文件内容，也就是对700下的每一个copy的redis.conf文件进行修改！如下："></a>第二步：把之前的redis.conf配置文件分别copy到700<em>修改各个文件内容，也就是对700</em>下的每一个copy的redis.conf文件进行修改！如下：</h3><ul>
+<li>daemonize yes      </li>
+<li>port 700*（分别对每个机器的端口号进行设置）         </li>
+<li>bind 192.168.131.171（必须要绑定当前机器的ip，不然会无限悲剧下去哇..深坑勿入！！！）   </li>
+<li>dir &#x2F;usr&#x2F;local&#x2F;redis-cluster&#x2F;700*&#x2F;（指定数据文件存放位置，必须要指定不同的目录位置，不然会丢失数据，深坑勿入！！！）   </li>
+<li>cluster-enabled yes（启动集群模式，开始玩耍）   </li>
+<li>cluster-config-file nodes700*.conf（这里700x最好和port对应上）   </li>
+<li>cluster-node-timeout 5000   </li>
+<li>appendonly yes</li>
+</ul>
+<h3 id="第三步：注意每个文件要修改端口号，bind的ip，数据存放的dir，并且nodes文件都需要进行修改！"><a href="#第三步：注意每个文件要修改端口号，bind的ip，数据存放的dir，并且nodes文件都需要进行修改！" class="headerlink" title="第三步：注意每个文件要修改端口号，bind的ip，数据存放的dir，并且nodes文件都需要进行修改！"></a>第三步：注意每个文件要修改端口号，bind的ip，数据存放的dir，并且nodes文件都需要进行修改！</h3><h3 id="第四步：由于redis集群需要使用ruby命令，所以我们需要安装ruby"><a href="#第四步：由于redis集群需要使用ruby命令，所以我们需要安装ruby" class="headerlink" title="第四步：由于redis集群需要使用ruby命令，所以我们需要安装ruby"></a>第四步：由于redis集群需要使用ruby命令，所以我们需要安装ruby</h3><ul>
+<li>yum -y install gcc openssl-devel libyaml-devel libffi-devel readline-devel zlib-devel gdbm-devel ncurses-devel gcc-c++ automake autoconf  </li>
+<li>yum -y install ruby rubygems </li>
+<li>gem install redis （安装redis和ruby的接口）</li>
+</ul>
+<h3 id="第五步：分别启动6个redis实例，然后检查是否启动成功"><a href="#第五步：分别启动6个redis实例，然后检查是否启动成功" class="headerlink" title="第五步：分别启动6个redis实例，然后检查是否启动成功"></a>第五步：分别启动6个redis实例，然后检查是否启动成功</h3><ul>
+<li>usr&#x2F;local&#x2F;redis&#x2F;bin&#x2F;redis-server &#x2F;usr&#x2F;local&#x2F;redis-cluster&#x2F;700*&#x2F;redis.conf </li>
+<li>ps -el | grep redis 查看是否启动成功</li>
+</ul>
+<h3 id="第六步：首先到redis3-0的安装目录下，然后执行redis-trib-rb命令。"><a href="#第六步：首先到redis3-0的安装目录下，然后执行redis-trib-rb命令。" class="headerlink" title="第六步：首先到redis3.0的安装目录下，然后执行redis-trib.rb命令。"></a>第六步：首先到redis3.0的安装目录下，然后执行redis-trib.rb命令。</h3><ul>
+<li>cd &#x2F;usr&#x2F;local&#x2F;redis3.0&#x2F;src</li>
+<li>.&#x2F;redis-trib.rb  create –replicas 1 192.168.131.171:7001 192.168.131.171:7002 192.168.131.171:7003 192.168.131.171:7004 192.168.131.171:7005 192.168.131.171:7006</li>
+</ul>
+<h3 id="第七步：到此为止我们集群搭建成功！进行验证："><a href="#第七步：到此为止我们集群搭建成功！进行验证：" class="headerlink" title="第七步：到此为止我们集群搭建成功！进行验证："></a>第七步：到此为止我们集群搭建成功！进行验证：</h3><ul>
+<li>连接任意一个客户端即可：.&#x2F;redis-cli -c -h -p （-c表示集群模式，指定ip地址和端口号）如：&#x2F;usr&#x2F;local&#x2F;redis&#x2F;bin&#x2F;redis-cli -c -h 192.168.131.171 -p 700*</li>
+<li>进行验证：cluster info（查看集群信息）、cluster nodes（查看节点列表）</li>
+<li>进行数据操作验证</li>
+<li>关闭集群则需要逐个进行关闭，使用命令：usr&#x2F;local&#x2F;redis&#x2F;bin&#x2F;redis-cli -c -h 192.168.131.171 -p 700* shutdown</li>
+</ul>
+<h3 id="第八步：（补充）"><a href="#第八步：（补充）" class="headerlink" title="第八步：（补充）"></a>第八步：（补充）</h3><p>友情提示：当出现集群无法启动时，删除临时的数据文件，再次重新启动每一个redis服务，然后重新构造集群环境。</p>
+<h3 id="第九步：（集群操作文章）"><a href="#第九步：（集群操作文章）" class="headerlink" title="第九步：（集群操作文章）"></a>第九步：（集群操作文章）</h3><p>redis-trib.rb官方群操作命令： <a target="_blank" rel="noopener" href="http://redis.io/topics/cluster-tutorial">链接</a></p>
+<p>推荐博客：<a target="_blank" rel="noopener" href="http://blog.51yip.com/nosql/1726.html/comment-page-1">链接</a></p>
+<h3 id="搭建可能遇到的问题"><a href="#搭建可能遇到的问题" class="headerlink" title="搭建可能遇到的问题"></a>搭建可能遇到的问题</h3><h4 id="ruby版本低下"><a href="#ruby版本低下" class="headerlink" title="ruby版本低下"></a>ruby版本低下</h4><p>升级方法：<a target="_blank" rel="noopener" href="http://www.iyu.co/web/centos-install-ruby/">链接</a></p>
+<h2 id="redis的特性"><a href="#redis的特性" class="headerlink" title="redis的特性"></a>redis的特性</h2><h3 id="快照-rdb"><a href="#快照-rdb" class="headerlink" title="快照(rdb)"></a>快照(rdb)</h3><p>(原理:每隔n分钟或N次写入后从内存dump数据形成rdb文件压缩，放至到目录上。完成rdb快照文件的生成之后，就替换之前的旧的快照文件)<br>save 900 1    &#x2F;&#x2F;900内,有1条写入,则产生快照<br>save 300 1000    &#x2F;&#x2F;如果300秒内有1000次写入,则产生快照<br>save 60 10000    &#x2F;&#x2F;如果60秒内有10000次写入,则产生快照</p>
+<blockquote>
+<p>NOTE:这3个选项都屏蔽,则rdb禁用<br>NOTE:新版本由新的进程(后台备份进程)导出.</p>
+</blockquote>
+<p>stop-writes-on-bgsave-error yes    &#x2F;&#x2F;后台备份进程出错时,主进程停不停止写入? (rdb的导入进程出错了，redis停止写入)<br>rdbcompression yes    &#x2F;&#x2F;导出的rdb文件是否压缩<br>Rdbchecksum yes    &#x2F;&#x2F;导入rbd恢复时数据时,要不要检验rdb的完整性:<br>dbfilename dump.rdb    &#x2F;&#x2F;导出来的rdb文件名<br>dir .&#x2F;    &#x2F;&#x2F;rdb的放置路径</p>
+<blockquote>
+<p>NOTE: 保存条件：1分钟，5分钟，15分钟才保存，所以不在里面做的修改，断电等,故障都会丢失。<br>NOTE: rdb的缺点，时间间隔内容易造成数据丢失。</p>
+</blockquote>
+<h3 id="日志-aof"><a href="#日志-aof" class="headerlink" title="日志(aof)"></a>日志(aof)</h3><p>(aof原理，每执行一个命令，aof进程都会将命令记录到txt文档中，写txt会严重拖慢redis。)<br>appendonly no    &#x2F;&#x2F;是否打开 aof日志功能(yes:打开)<br>appendfsync always    &#x2F;&#x2F;每1个命令,都立即同步到aof. 安全,速度慢<br>appendfsync everysec    &#x2F;&#x2F;折衷方案,每秒写1次<br>appendfsync no    &#x2F;&#x2F;写入工作交给操作系统,由操作系统判断缓冲区大小,统一写入到aof. 同步频率低,速度快,<br>no-appendfsync-on-rewrite yes:    &#x2F;&#x2F;正在导出rdb快照的过程中,要不要停止同步aof<br>auto-aof-rewrite-percentage 100    &#x2F;&#x2F;aof文件大小比起上次重写时的大小,增长率100%时,重写<br>auto-aof-rewrite-min-size 64mb    &#x2F;&#x2F;aof文件,至少超过64M时,重写</p>
+<h3 id="aof的fsync策略"><a href="#aof的fsync策略" class="headerlink" title="aof的fsync策略"></a>aof的fsync策略</h3><ul>
+<li><p>每次写入一条数据就执行一次fsync</p>
+<blockquote>
+<p>每次写入一条数据，立即将这个数据对应的写日志fsync到磁盘上去，性能非常非常差，吞吐量很低; 确保说redis里的数据一条都不丢，那就只能这样了。</p>
+</blockquote>
+</li>
+<li><p>每隔一秒执行一次fsync</p>
+<blockquote>
+<p>每秒将os cache中的数据fsync到磁盘，这个最常用的，生产环境一般都这么配置，性能很高，QPS还是可以上万的。</p>
+</blockquote>
+</li>
+<li><p>不主动执行fsync</p>
+<blockquote>
+<p>仅仅redis负责将数据写入os cache就撒手不管了，然后后面os自己会时不时有自己的策略将数据刷入磁盘，不可控了。</p>
+</blockquote>
+</li>
+</ul>
+<h3 id="哨兵（sentinel，sentinel主要是监控主从redis是否运行正常，不正常切换主从-）"><a href="#哨兵（sentinel，sentinel主要是监控主从redis是否运行正常，不正常切换主从-）" class="headerlink" title="哨兵（sentinel，sentinel主要是监控主从redis是否运行正常，不正常切换主从.）"></a>哨兵（sentinel，sentinel主要是监控主从redis是否运行正常，不正常切换主从.）</h3><p>sentinel监控主从原理：监控主redis,如果不回应出现问题，就会将slave设为master，其他slave指向它。<br>Sentinel不断与master通信,获取master的slave信息，监听master与slave的状态。<br>如果某slave失效,直接通知master去除该slave.<br>如果master失效,,是按照slave优先级(可配置), 选取1个slave做 new master。</p>
+<h3 id="主从复制流程（这个过程是异步的）"><a href="#主从复制流程（这个过程是异步的）" class="headerlink" title="主从复制流程（这个过程是异步的）"></a>主从复制流程（这个过程是异步的）</h3><ul>
+<li>1、slave server启动连接到master server之后，salve server主动发送SYNC命令给master server。</li>
+<li>2、master server接受SYNC命令之后，判断，是否有正在进行内存快照的子进程，如果有，则等待其结束，否则，fork一个子进程，子进程把内存数据保存为文件，并发送给slave server。</li>
+<li>3、master server子进程进程做数据快照时，父进程可以继续接收client端请求写数据，此时，父进程把新写入的数据放到待发送缓存队列(backlog,默认大小是1M)中。</li>
+<li>4、slave server 接收内存快照文件之后，清空内存数据，根据接收的快照文件，重建内存表数据结构。</li>
+<li>5、master server把快照文件发送完毕之后，发送缓存队列中保存的子进程快照期间改变的数据给slave server，slave server做相同处理，保存数据一致性。</li>
+<li>6、master server 后续接收的数据，都会通过步骤1建立的连接，把数据发送到slave server。</li>
+</ul>
+<p>NOTE:<br>（1）redis采用异步方式复制数据到slave节点，不过redis 2.8开始，slave node会周期性地确认自己每次复制的数据量<br>（2）一个master node是可以配置多个slave node的<br>（3）slave node也可以连接其他的slave node<br>（4）slave node做复制的时候，是不会block master node的正常工作的<br>（5）slave node在做复制的时候，也不会block对自己的查询操作，它会用旧的数据集来提供服务; 但是复制完成的时候，需要删除旧数据集，加载新数据集，这个时候就会暂停对外服务了<br>（6）slave node主要用来进行横向扩容，做读写分离，扩容的slave node可以提高读的吞吐量    </p>
+<h3 id="异步复制导致的数据丢失（redis数据复制问题）"><a href="#异步复制导致的数据丢失（redis数据复制问题）" class="headerlink" title="异步复制导致的数据丢失（redis数据复制问题）"></a>异步复制导致的数据丢失（redis数据复制问题）</h3><blockquote>
+<p>因为master -&gt; slave的复制是异步的，所以可能有部分数据还没复制到slave，master就宕机了，此时这些部分数据就丢失了</p>
+</blockquote>
+<h3 id="脑裂（redis数据复制问题）"><a href="#脑裂（redis数据复制问题）" class="headerlink" title="脑裂（redis数据复制问题）"></a>脑裂（redis数据复制问题）</h3><blockquote>
+<p>也就是说，某个master所在机器突然脱离了正常的网络，跟其他slave机器不能连接，但是实际上master还运行着<br>此时哨兵可能就会认为master宕机了，然后开启选举，将其他slave切换成了master<br>这个时候，集群里就会有两个master，也就是所谓的脑裂<br>此时虽然某个slave被切换成了master，但是可能client还没来得及切换到新的master，还继续写向旧master的数据可能也丢失了<br>因此旧master再次恢复的时候，会被作为一个slave挂到新的master上去，自己的数据会清空，重新从新的master复制数据</p>
+</blockquote>
+<h2 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h2><p>Q:在dump rdb过程中,aof如果停止同步,会不会丢失？</p>
+<blockquote>
+<p>A:不会,所有的操作缓存在内存的队列里, dump完成后,统一操作.</p>
+</blockquote>
+<p>Q:aof重写什么意思？</p>
+<blockquote>
+<p>A:aof重写是指把内存中的数据,逆化成命令,写入到.aof日志里.<br>以解决 aof日志过大的问题.（因为对同一key value操作的步骤比较多，日志比较多，但内存中就有一个最终的状态，所以重写成简单一次性命令<br>比如最终set key value.降低文件的大小。</p>
+</blockquote>
+<p>Q:如果rdb文件,和aof文件都存在,优先用谁来恢复数据？</p>
+<blockquote>
+<p>A:aof文件的完整度较高。</p>
+</blockquote>
+<p>Q:恢复时rdb和aof哪个恢复的快？</p>
+<blockquote>
+<p>A:rdb快,因为其是数据的内存映射,直接载入到内存,而aof是命令,需要逐条执行。</p>
+</blockquote>
+<p>Q:sentinel与master通信,如果某次因为master IO操作频繁,导致超时,此时,认为master失效,很武断，怎么办？</p>
+<blockquote>
+<p>A:sentnel允许多个实例看守1个master, 当N台(N可设置)sentinel都认为master失效,才正式失效。</p>
+</blockquote>
+<p>Q:在redis中保存几条数据，立即停掉redis进程，然后重启redis，数据还在吗？为什么？</p>
+<blockquote>
+<p>A:带出来一个知识点，通过redis-cli SHUTDOWN这种方式去停掉redis，其实是一种安全退出的模式，redis在退出的时候会将内存中的数据立即生成一份完整的rdb快照</p>
+</blockquote>
+<p>redis缓存架构<a target="_blank" rel="noopener" href="https://www.jianshu.com/u/baad5ee99ca9">链接</a></p>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/redis/">redis</a></div><div class="post-share"><div class="social-share" data-image="/img/hnpham_icon.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2017/08/27/usage-rabbitmq/" title="rabbitmq使用"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">rabbitmq使用</div></div><div class="info-2"><div class="info-item-1">Rabbitmq的基本概念Queue（队列） RabbitMQ的内部对象，用于存储消息。生产者最终的消息投递到Queue中，然后消费者从Queue中获取消息并且消费。多个消费者可以订阅同一个Queue，这样的话消息会被平均分摊给消费者并处理。  Message acknowledgment（消息回执） 消费者收到Queue中的消息但是没有处理完成的话就Down机了，这种情况下可能导致消息丢失，因此需要消费者在消费完消息后发送一个回执给RabbitMQ，RabbitMQ收到消息回执（Message acknowledgment）后才将消息从Queue中移除，如果RabbitMQ没有收到回执并检测到消费者的RabbitMQ链接断开，则RabbitMQ会将该消息发送给其他消费者（如果存在多个消费者进行处理的话）。这里不存在timeout概念，一个消费者处理消息时间再长也不会导致该消息被发送到其他消费者，除非他的RabbitMQ链接断开。所以处理完之后一定要有回执（Message acknowledgment）。  Message durability 如果希望RabbitMQ服务器重启...</div></div></div></a><a class="pagination-related" href="/2017/07/08/boot-start/" title="服务端的boot程序"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">服务端的boot程序</div></div><div class="info-2"><div class="info-item-1">本项目举例链接 spring-boot windows服务端的启动 1 使用maven生成jar包 2 java -jar linuxx.jar 可跟profile文件 3 打包成可执行的war包操作链接  spring-boot linux服务端的启动关闭应用的脚本：stop.sh123456789#!/bin/bashPID=$(ps -ef | grep linuxx.jar | grep -v grep | awk &#x27;&#123; print $2 &#125;&#x27;)if [ -z &quot;$PID&quot; ]then    echo Application is already stoppedelse    echo kill $PID    kill $PIDfi  启动应用的脚本：start.sh12#!/bin/bashnohup java -jar linuxx.jar --server.port=8888 &amp;  整合了关闭和启动的脚本：run.sh由于会先执行关闭应用，然后再启动应用，这样不会引起端口冲突等问题，适合在持续集成...</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/hnpham_icon.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">HnPham</div><div class="author-info-description"></div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">37</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">21</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">攒了很多东西要买，但是没攒钱。</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA"><span class="toc-number">1.</span> <span class="toc-text">集群搭建</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E6%AD%A5%EF%BC%9A%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9redis-cluster%EF%BC%8C%E7%84%B6%E5%90%8E%E5%9C%A8%E5%85%B6%E4%B8%8B%E9%9D%A2%E5%88%86%E5%88%AB%E5%88%9B%E5%BB%BA6%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E5%A6%82%E4%B8%8B%EF%BC%9A"><span class="toc-number">1.1.</span> <span class="toc-text">第一步：创建一个文件夹redis-cluster，然后在其下面分别创建6个文件夹如下：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E6%AD%A5%EF%BC%9A%E6%8A%8A%E4%B9%8B%E5%89%8D%E7%9A%84redis-conf%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E5%88%86%E5%88%ABcopy%E5%88%B0700%E4%BF%AE%E6%94%B9%E5%90%84%E4%B8%AA%E6%96%87%E4%BB%B6%E5%86%85%E5%AE%B9%EF%BC%8C%E4%B9%9F%E5%B0%B1%E6%98%AF%E5%AF%B9700%E4%B8%8B%E7%9A%84%E6%AF%8F%E4%B8%80%E4%B8%AAcopy%E7%9A%84redis-conf%E6%96%87%E4%BB%B6%E8%BF%9B%E8%A1%8C%E4%BF%AE%E6%94%B9%EF%BC%81%E5%A6%82%E4%B8%8B%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">第二步：把之前的redis.conf配置文件分别copy到700修改各个文件内容，也就是对700下的每一个copy的redis.conf文件进行修改！如下：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E6%AD%A5%EF%BC%9A%E6%B3%A8%E6%84%8F%E6%AF%8F%E4%B8%AA%E6%96%87%E4%BB%B6%E8%A6%81%E4%BF%AE%E6%94%B9%E7%AB%AF%E5%8F%A3%E5%8F%B7%EF%BC%8Cbind%E7%9A%84ip%EF%BC%8C%E6%95%B0%E6%8D%AE%E5%AD%98%E6%94%BE%E7%9A%84dir%EF%BC%8C%E5%B9%B6%E4%B8%94nodes%E6%96%87%E4%BB%B6%E9%83%BD%E9%9C%80%E8%A6%81%E8%BF%9B%E8%A1%8C%E4%BF%AE%E6%94%B9%EF%BC%81"><span class="toc-number">1.3.</span> <span class="toc-text">第三步：注意每个文件要修改端口号，bind的ip，数据存放的dir，并且nodes文件都需要进行修改！</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E5%9B%9B%E6%AD%A5%EF%BC%9A%E7%94%B1%E4%BA%8Eredis%E9%9B%86%E7%BE%A4%E9%9C%80%E8%A6%81%E4%BD%BF%E7%94%A8ruby%E5%91%BD%E4%BB%A4%EF%BC%8C%E6%89%80%E4%BB%A5%E6%88%91%E4%BB%AC%E9%9C%80%E8%A6%81%E5%AE%89%E8%A3%85ruby"><span class="toc-number">1.4.</span> <span class="toc-text">第四步：由于redis集群需要使用ruby命令，所以我们需要安装ruby</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%BA%94%E6%AD%A5%EF%BC%9A%E5%88%86%E5%88%AB%E5%90%AF%E5%8A%A86%E4%B8%AAredis%E5%AE%9E%E4%BE%8B%EF%BC%8C%E7%84%B6%E5%90%8E%E6%A3%80%E6%9F%A5%E6%98%AF%E5%90%A6%E5%90%AF%E5%8A%A8%E6%88%90%E5%8A%9F"><span class="toc-number">1.5.</span> <span class="toc-text">第五步：分别启动6个redis实例，然后检查是否启动成功</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E5%85%AD%E6%AD%A5%EF%BC%9A%E9%A6%96%E5%85%88%E5%88%B0redis3-0%E7%9A%84%E5%AE%89%E8%A3%85%E7%9B%AE%E5%BD%95%E4%B8%8B%EF%BC%8C%E7%84%B6%E5%90%8E%E6%89%A7%E8%A1%8Credis-trib-rb%E5%91%BD%E4%BB%A4%E3%80%82"><span class="toc-number">1.6.</span> <span class="toc-text">第六步：首先到redis3.0的安装目录下，然后执行redis-trib.rb命令。</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%B8%83%E6%AD%A5%EF%BC%9A%E5%88%B0%E6%AD%A4%E4%B8%BA%E6%AD%A2%E6%88%91%E4%BB%AC%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA%E6%88%90%E5%8A%9F%EF%BC%81%E8%BF%9B%E8%A1%8C%E9%AA%8C%E8%AF%81%EF%BC%9A"><span class="toc-number">1.7.</span> <span class="toc-text">第七步：到此为止我们集群搭建成功！进行验证：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E5%85%AB%E6%AD%A5%EF%BC%9A%EF%BC%88%E8%A1%A5%E5%85%85%EF%BC%89"><span class="toc-number">1.8.</span> <span class="toc-text">第八步：（补充）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%B9%9D%E6%AD%A5%EF%BC%9A%EF%BC%88%E9%9B%86%E7%BE%A4%E6%93%8D%E4%BD%9C%E6%96%87%E7%AB%A0%EF%BC%89"><span class="toc-number">1.9.</span> <span class="toc-text">第九步：（集群操作文章）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%90%AD%E5%BB%BA%E5%8F%AF%E8%83%BD%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-number">1.10.</span> <span class="toc-text">搭建可能遇到的问题</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#ruby%E7%89%88%E6%9C%AC%E4%BD%8E%E4%B8%8B"><span class="toc-number">1.10.1.</span> <span class="toc-text">ruby版本低下</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#redis%E7%9A%84%E7%89%B9%E6%80%A7"><span class="toc-number">2.</span> <span class="toc-text">redis的特性</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BF%AB%E7%85%A7-rdb"><span class="toc-number">2.1.</span> <span class="toc-text">快照(rdb)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%97%A5%E5%BF%97-aof"><span class="toc-number">2.2.</span> <span class="toc-text">日志(aof)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#aof%E7%9A%84fsync%E7%AD%96%E7%95%A5"><span class="toc-number">2.3.</span> <span class="toc-text">aof的fsync策略</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%93%A8%E5%85%B5%EF%BC%88sentinel%EF%BC%8Csentinel%E4%B8%BB%E8%A6%81%E6%98%AF%E7%9B%91%E6%8E%A7%E4%B8%BB%E4%BB%8Eredis%E6%98%AF%E5%90%A6%E8%BF%90%E8%A1%8C%E6%AD%A3%E5%B8%B8%EF%BC%8C%E4%B8%8D%E6%AD%A3%E5%B8%B8%E5%88%87%E6%8D%A2%E4%B8%BB%E4%BB%8E-%EF%BC%89"><span class="toc-number">2.4.</span> <span class="toc-text">哨兵（sentinel，sentinel主要是监控主从redis是否运行正常，不正常切换主从.）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6%E6%B5%81%E7%A8%8B%EF%BC%88%E8%BF%99%E4%B8%AA%E8%BF%87%E7%A8%8B%E6%98%AF%E5%BC%82%E6%AD%A5%E7%9A%84%EF%BC%89"><span class="toc-number">2.5.</span> <span class="toc-text">主从复制流程（这个过程是异步的）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BC%82%E6%AD%A5%E5%A4%8D%E5%88%B6%E5%AF%BC%E8%87%B4%E7%9A%84%E6%95%B0%E6%8D%AE%E4%B8%A2%E5%A4%B1%EF%BC%88redis%E6%95%B0%E6%8D%AE%E5%A4%8D%E5%88%B6%E9%97%AE%E9%A2%98%EF%BC%89"><span class="toc-number">2.6.</span> <span class="toc-text">异步复制导致的数据丢失（redis数据复制问题）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%84%91%E8%A3%82%EF%BC%88redis%E6%95%B0%E6%8D%AE%E5%A4%8D%E5%88%B6%E9%97%AE%E9%A2%98%EF%BC%89"><span class="toc-number">2.7.</span> <span class="toc-text">脑裂（redis数据复制问题）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98"><span class="toc-number">3.</span> <span class="toc-text">常见问题</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/08/24/online-compiler/" title="在线编译器">在线编译器</a><time datetime="2025-08-24T11:43:51.939Z" title="发表于 2025-08-24 19:43:51">2025-08-24</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2019/09/28/why-lamda-needs-final/" title="为什么lambda需要final">为什么lambda需要final</a><time datetime="2019-09-28T09:22:24.000Z" title="发表于 2019-09-28 17:22:24">2019-09-28</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2019/08/16/CORS/" title="跨源请求">跨源请求</a><time datetime="2019-08-16T06:17:53.000Z" title="发表于 2019-08-16 14:17:53">2019-08-16</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2019/06/07/java-oop/" title="java OOP">java OOP</a><time datetime="2019-06-07T01:07:21.000Z" title="发表于 2019-06-07 09:07:21">2019-06-07</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2019/06/02/java-generics/" title="java泛型">java泛型</a><time datetime="2019-06-02T01:07:21.000Z" title="发表于 2019-06-02 09:07:21">2019-06-02</time></div></div></div></div></div></div></main><footer id="footer" style="background: orange;"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2019 - 2025 By HnPham</span></div><div class="footer_custom_text">人最应做的是生活 而非生存</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"></div><canvas class="fireworks" mobile="false"></canvas><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/fireworks.min.js"></script><script defer="defer" id="ribbon" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-ribbon.min.js" size="150" alpha="0.6" zIndex="-1" mobile="false" data-click="false"></script><script defer="defer" id="fluttering_ribbon" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-fluttering-ribbon.min.js"></script></div></body></html>

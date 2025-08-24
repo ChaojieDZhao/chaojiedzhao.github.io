@@ -1,0 +1,230 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>rabbitmq使用 | 喊你帕木</title><meta name="author" content="HnPham"><meta name="copyright" content="HnPham"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Rabbitmq的基本概念Queue（队列） RabbitMQ的内部对象，用于存储消息。生产者最终的消息投递到Queue中，然后消费者从Queue中获取消息并且消费。多个消费者可以订阅同一个Queue，这样的话消息会被平均分摊给消费者并处理。  Message acknowledgment（消息回执） 消费者收到Queue中的消息但是没有处理完成的话就Down机了，这种情况下可能导致消息丢失，因此">
+<meta property="og:type" content="article">
+<meta property="og:title" content="rabbitmq使用">
+<meta property="og:url" content="http://example.com/2017/08/27/usage-rabbitmq/index.html">
+<meta property="og:site_name" content="喊你帕木">
+<meta property="og:description" content="Rabbitmq的基本概念Queue（队列） RabbitMQ的内部对象，用于存储消息。生产者最终的消息投递到Queue中，然后消费者从Queue中获取消息并且消费。多个消费者可以订阅同一个Queue，这样的话消息会被平均分摊给消费者并处理。  Message acknowledgment（消息回执） 消费者收到Queue中的消息但是没有处理完成的话就Down机了，这种情况下可能导致消息丢失，因此">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/hnpham_icon.jpg">
+<meta property="article:published_time" content="2017-08-27T12:01:36.000Z">
+<meta property="article:modified_time" content="2025-06-05T07:34:34.097Z">
+<meta property="article:author" content="HnPham">
+<meta property="article:tag" content="rabbitmq">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/hnpham_icon.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "rabbitmq使用",
+  "url": "http://example.com/2017/08/27/usage-rabbitmq/",
+  "image": "http://example.com/img/hnpham_icon.jpg",
+  "datePublished": "2017-08-27T12:01:36.000Z",
+  "dateModified": "2025-06-05T07:34:34.097Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "HnPham",
+      "url": "http://example.com"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/2017/08/27/usage-rabbitmq/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":true,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'rabbitmq使用',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">喊你帕木</span></a><a class="nav-page-title" href="/"><span class="site-name">rabbitmq使用</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">rabbitmq使用</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="fa-fw post-meta-icon far fa-calendar-alt"></i><span class="post-meta-label">发表于</span><time datetime="2017-08-27T12:01:36.000Z" title="发表于 2017-08-27 20:01:36">2017-08-27</time></span></div><div class="meta-secondline"></div></div></div><article class="container post-content" id="article-container"><h2 id="Rabbitmq的基本概念"><a href="#Rabbitmq的基本概念" class="headerlink" title="Rabbitmq的基本概念"></a>Rabbitmq的基本概念</h2><h3 id="Queue（队列）"><a href="#Queue（队列）" class="headerlink" title="Queue（队列）"></a>Queue（队列）</h3><blockquote>
+<p>RabbitMQ的内部对象，用于存储消息。生产者最终的消息投递到Queue中，然后消费者从Queue中获取消息并且消费。多个消费者可以订阅同一个Queue，这样的话消息会被平均分摊给消费者并处理。</p>
+</blockquote>
+<h3 id="Message-acknowledgment（消息回执）"><a href="#Message-acknowledgment（消息回执）" class="headerlink" title="Message acknowledgment（消息回执）"></a>Message acknowledgment（消息回执）</h3><blockquote>
+<p>消费者收到Queue中的消息但是没有处理完成的话就Down机了，这种情况下可能导致消息丢失，因此需要消费者在消费完消息后发送一个回执给RabbitMQ，<br>RabbitMQ收到消息回执（Message acknowledgment）后才将消息从Queue中移除，如果RabbitMQ没有收到回执并检测到消费者的RabbitMQ链接断开，则RabbitMQ会将该消息发送给其他消费者（如果存在多个消费者进行处理的话）。<br>这里不存在timeout概念，一个消费者处理消息时间再长也不会导致该消息被发送到其他消费者，除非他的RabbitMQ链接断开。<em><strong>所以处理完之后一定要有回执（Message acknowledgment）</strong></em>。</p>
+</blockquote>
+<h3 id="Message-durability"><a href="#Message-durability" class="headerlink" title="Message durability"></a>Message durability</h3><blockquote>
+<p>如果希望RabbitMQ服务器重启的情况下，也不想丢失数据，我们可以设置Queue和Messgae都设置为可持久化的（duration），这样可以保证绝大部分情况我们的RabbitMQ的消息不会丢失。但是依然解决不了小概率丢失时间的发生（比如RabbitMQ服务器已经接受了生产者的消息，但还是没有来得及持久化该消息的时候RabbitMQ断电了），如果需要对这种小概率时间也要管理起来，那么我们要用到事物。</p>
+</blockquote>
+<h3 id="Prefetch-count"><a href="#Prefetch-count" class="headerlink" title="Prefetch count"></a>Prefetch count</h3><blockquote>
+<p>我们提到多个消费者同时订阅同一个Queue中的消息，Queue中的消息就会被平摊给多个消费者。这是如果每个消息的处理时间不同，就有可能会导致某些消费者一直在忙，而有些消费者很快就处理完了手头工作并且一直处于空闲的状态。我们可以通过设置PrefetchCount来限制Queue每次发送给每个消费者的消息数，比如我们设置为PrefetchCount&#x3D;1，则Queue每次给每个消费者发送一条消息，消费者处理完这条消息后Queue会再给该消费者发送一条消息。</p>
+</blockquote>
+<h3 id="Exchange"><a href="#Exchange" class="headerlink" title="Exchange"></a>Exchange</h3><blockquote>
+<p>我们在之前提到过生产者将消息投递到Queue中，实际上这在RabbitMQ中这种情况是永远不会发生的。实际的情况是，生产者将消息发送到Exchange（交换器），由Exchange将消费路由到一个或者多个Queue中。</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">channel.exchangeDeclare(EXCHANGE_NAME, &quot;fanout&quot;);    //声明一个fanout类型的交换机</span><br></pre></td></tr></table></figure>
+
+<h3 id="Exchange-Type"><a href="#Exchange-Type" class="headerlink" title="Exchange Type"></a>Exchange Type</h3><blockquote>
+<p>RabbitMQ常用的Exchange Type有fanout,direct,topic,header这四种（AMQP规范里面还提到了两种类型分别是system和自定义）。</p>
+</blockquote>
+<h4 id="fanout"><a href="#fanout" class="headerlink" title="fanout"></a>fanout</h4><blockquote>
+<p>fanout类型的Exchange路由规则非常简单，就是把所有发送到该Exchange的消息路由到所有与他绑定的Queue中。</p>
+</blockquote>
+<h4 id="direct"><a href="#direct" class="headerlink" title="direct"></a>direct</h4><blockquote>
+<p>direct类型的Exchange路由规则也很简单，他会把消息路由到那些Binding Key与Routing Key完全匹配的Queue中。</p>
+</blockquote>
+<h4 id="topic"><a href="#topic" class="headerlink" title="topic"></a>topic</h4><blockquote>
+<p>前面讲到direct类型的Exchange路由规则是完全匹配binding key与routing key，但这种严格的匹配方式在很多情况下不能满足实际业务需求。topic类型的Exchange在匹配规则上进行了扩展，它与direct类型的Exchage相似，也是将消息路由到binding key与routing key相匹配的Queue中，但这里的匹配规则有些不同，它约定：</p>
+</blockquote>
+<ul>
+<li>routing key为一个句点号“. ”分隔的字符串（我们将被句点号“. ”分隔开的每一段独立的字符串称为一个单词），如“stock.usd.nyse”、“nyse.vmw”、“quick.orange.rabbit”</li>
+<li>binding key与routing key一样也是句点号“. ”分隔的字符串</li>
+<li>binding key中可以存在两种特殊字符“<em>”与“#”，用于做模糊匹配，其中“</em>”用于匹配一个单词，“#”用于匹配多个单词（可以是零个）</li>
+</ul>
+<h4 id="headers"><a href="#headers" class="headerlink" title="headers"></a>headers</h4><blockquote>
+<p>headers类型的Exchange不依赖于routing key与binding key的匹配规则来路由消息，而是根据发送的消息内容中的headers属性进行匹配。<br>在绑定Queue与Exchange时指定一组键值对；当消息发送到Exchange时，RabbitMQ会取到该消息的headers（也是一个键值对的形式），对比其中的键值对是否完全匹配Queue与Exchange绑定时指定的键值对；如果完全匹配则消息会路由到该Queue，否则不会路由到该Queue。<br>该类型的Exchange没有用到过（不过也应该很有用武之地），所以不做介绍。</p>
+</blockquote>
+<h3 id="Binding"><a href="#Binding" class="headerlink" title="Binding"></a>Binding</h3><blockquote>
+<p>RabbitMQ中通过Binding将Exchange与Queue关联起来，这样RabbitMQ就知道如何正确的将消息路由到指定的Queue了。</p>
+</blockquote>
+<h3 id="Binding-Key"><a href="#Binding-Key" class="headerlink" title="Binding Key"></a>Binding Key</h3><blockquote>
+<p>在绑定（Binding)Exchange与Queue的同时，一般会指定一个Binding Key（parkos.41010502111111）;<br>在绑定多个Queue到同一个Exchange的时候，这些Binding允许使用想用的Binding Key。<br>Binding Key并不是在所有情况下都生效，他依赖于Exchange Type，比如fanout类型的Exchange就会无视Binding Key，而是将消息路由到所有绑定到该Exchange的Queue。</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">channel.queueBind(queueName, EXCHANGE_NAME, &quot;parkos.41010502111111&quot;);   </span><br></pre></td></tr></table></figure>
+
+<h3 id="Routing-Key（生产者发送信息时指定，通常情况下，direct，topic类型的交换机，如果Routing-Key和Binding-Key匹配，则该队列就会获取该消息）"><a href="#Routing-Key（生产者发送信息时指定，通常情况下，direct，topic类型的交换机，如果Routing-Key和Binding-Key匹配，则该队列就会获取该消息）" class="headerlink" title="Routing Key（生产者发送信息时指定，通常情况下，direct，topic类型的交换机，如果Routing Key和Binding Key匹配，则该队列就会获取该消息）"></a>Routing Key（生产者发送信息时指定，通常情况下，direct，topic类型的交换机，如果Routing Key和Binding Key匹配，则该队列就会获取该消息）</h3><blockquote>
+<p>生产者将消息发送给Exchange的时候，一般会指定一个Routing Key（parkos.41010502111111），来指定这个消息的路由规则，而这个Routing Key需要与Exchange Type和Binding Key联合使用才能最终生效。在Exchange Type与Binding Key固定的情况下（在正常使用时一般这些内容都是固定配置好的），我们的生产者就可以在发送消息给Exchange时，通过指定Routing Key来决定消息流向哪里。RabbitMQ为Routing Key设定的长度限制为255 bytes。</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">this.rabbitTemplate.convertAndSend(exchange, &quot;parkos.41010502111111&quot;, message, new MessagePostProcessor() &#123;</span><br><span class="line">        @Override</span><br><span class="line">        public Message postProcessMessage(Message msg) throws AmqpException &#123;</span><br><span class="line">            msg.getMessageProperties().setPriority(message.getPri());</span><br><span class="line">            return msg;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;, correlationData);</span><br></pre></td></tr></table></figure>
+
+<h4 id="RPC"><a href="#RPC" class="headerlink" title="RPC"></a>RPC</h4><blockquote>
+<p>MQ本身是基于异步的消息处理，前面的示例中所有的生产者（P）将消息发送到RabbitMQ后不会知道消费者（C）处理成功或者失败（甚至连有没有消费者来处理这条消息都不知道）。<br>但实际的应用场景中，我们很可能需要一些同步处理，需要同步等待服务端将我的消息处理完成后再进行下一步处理。这相当于RPC（Remote Procedure Call，远程过程调用）。在RabbitMQ中也支持RPC。<br>RabbitMQ基础概念详细介绍<br>RabbitMQ中实现RPC的机制是：<br>客户端发送请求（消息）时，在消息的属性（MessageProperties，在AMQP协议中定义了14中properties，这些属性会随着消息一起发送）中设置两个值replyTo（一个Queue名称，用于告诉服务器处理完成后将通知我的消息发送到这个Queue中）和correlationId（此次请求的标识号，服务器处理完成后需要将此属性返还，客户端将根据这个id了解哪条请求被成功执行了或执行失败）<br>服务器端收到消息并处理<br>服务器端处理完消息后，将生成一条应答消息到replyTo指定的Queue，同时带上correlationId属性<br>客户端之前已订阅replyTo指定的Queue，从中收到服务器的应答消息后，根据其中的correlationId属性分析哪条请求被执行了，根据执行结果进行后续业务处理       </p>
+</blockquote>
+<h4 id="Virtual-hosts"><a href="#Virtual-hosts" class="headerlink" title="Virtual hosts"></a>Virtual hosts</h4><blockquote>
+<p>每个virtual host本质上都是一个RabbitMQ Server，拥有它自己的queue，exchagne，和bings rule等等。这保证了你可以在多个不同的application中使用RabbitMQ。</p>
+</blockquote>
+<h2 id="安装RabbitMQ"><a href="#安装RabbitMQ" class="headerlink" title="安装RabbitMQ"></a>安装RabbitMQ</h2><h3 id="源码安装Erlang"><a href="#源码安装Erlang" class="headerlink" title="源码安装Erlang"></a>源码安装Erlang</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">yum -y install wget</span><br><span class="line">wget -c http://www.erlang.org/download/otp_src_19.2.tar.gz   (该链接务必从官网拿到,这文件不是一般的大~~)</span><br><span class="line">tar -xvf otp_src_19.2.tar.gz </span><br><span class="line">yum install gcc gcc-c++glibc-devel xz make ncurses-devel openssl-devel xmlto</span><br><span class="line">yum -y install perl ncurses-devel</span><br><span class="line"></span><br><span class="line">cd otp_src_19.2</span><br><span class="line">./configure --prefix=/opt/erlang --with-ssl -enable-threads -enable-smmp-support -enable-kernel-poll --enable-hipe --without-javac</span><br><span class="line">make &amp;&amp; make install</span><br><span class="line">vi /root/.bashrc</span><br><span class="line">添加</span><br><span class="line">export ERLANG_HOME=/opt/erlang</span><br><span class="line">export PATH=$ERLANG_HOME/bin:$PATH</span><br><span class="line"></span><br><span class="line">erl --version(查看是够安装成功,到此完成了)</span><br></pre></td></tr></table></figure>
+
+<h3 id="rpm安装Erlang"><a href="#rpm安装Erlang" class="headerlink" title="rpm安装Erlang"></a>rpm安装Erlang</h3><blockquote>
+<p>去<a target="_blank" rel="noopener" href="https://github.com/rabbitmq/erlang-rpm/releases%E4%B8%8B%E8%BD%BDerlang-rpm">https://github.com/rabbitmq/erlang-rpm/releases下载erlang-rpm</a></p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum -ivh erlang-rpm</span><br></pre></td></tr></table></figure>
+
+<h3 id="安装和使用rabbitmq"><a href="#安装和使用rabbitmq" class="headerlink" title="安装和使用rabbitmq"></a>安装和使用rabbitmq</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">wget -c https://dl.bintray.com/rabbitmq/rabbitmq-server-rpm/rabbitmq-server-3.6.12-1.el7.noarch.rpm</span><br><span class="line">yum -y install socat    #安装依赖的插件</span><br><span class="line">yum -y install rabbitmq-server-3.6.12-1.el7.noarch.rpm    #至此安装成功</span><br><span class="line">systemctl enable rabbitmq-server    #开启服务</span><br><span class="line">systemctl start rabbitmq-server    #启动服务</span><br><span class="line">rabbitmqctl add_user jiege jiege    #添加用户</span><br><span class="line">rabbitmqctl set_user_tags jiege administrator    #设置角色  </span><br><span class="line">rabbitmqctl set_permissions -p &quot;/&quot; jiege &quot;.*&quot; &quot;.*&quot; &quot;.*&quot;     #赋予权限</span><br><span class="line">rabbitmq-plugins enable rabbitmq_management    #开启远程服务</span><br></pre></td></tr></table></figure>
+
+<h3 id="消息回调"><a href="#消息回调" class="headerlink" title="消息回调"></a>消息回调</h3><blockquote>
+<p>如果消息没有到exchange,则confirm回调,ack&#x3D;false<br>如果消息到达exchange,则confirm回调,ack&#x3D;true<br>exchange到queue成功,则不回调return<br>exchange到queue失败,则回调return(需设置mandatory&#x3D;true,否则不回回调,消息就丢了)</p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/rabbitmq/">rabbitmq</a></div><div class="post-share"><div class="social-share" data-image="/img/hnpham_icon.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2017/11/25/python-grammar-notes/" title="python特殊语法笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">python特殊语法笔记</div></div><div class="info-2"><div class="info-item-1">Beautiful is better than ugly.Explicit is better than implicit.Simple is better than complex.Complex is better than complicated.Flat is better than nested.Sparse is better than dense.Readability counts.Special cases aren’t special enough to break the rules.Although practicality beats purity.Errors should never pass silently.Unless explicitly silenced.In the face of ambiguity, refuse the temptation to guess.There should be one– and preferably only one –obvious way to do it.Although that way ma...</div></div></div></a><a class="pagination-related" href="/2017/08/17/usage-redis/" title="redis使用"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">redis使用</div></div><div class="info-2"><div class="info-item-1">集群搭建第一步：创建一个文件夹redis-cluster，然后在其下面分别创建6个文件夹如下： mkdir -p &#x2F;usr&#x2F;local&#x2F;redis-cluster     mkdir 7001、mkdir 7002、mkdir 7003、mkdir 7004、mkdir 7005、mkdir 7006  第二步：把之前的redis.conf配置文件分别copy到700修改各个文件内容，也就是对700下的每一个copy的redis.conf文件进行修改！如下： daemonize yes       port 700*（分别对每个机器的端口号进行设置）          bind 192.168.131.171（必须要绑定当前机器的ip，不然会无限悲剧下去哇..深坑勿入！！！）    dir &#x2F;usr&#x2F;local&#x2F;redis-cluster&#x2F;700*&#x2F;（指定数据文件存放位置，必须要指定不同的目录位置，不然会丢失数据，深坑勿入！！！）    cluster-enabled yes（启动集群模式，开始玩耍）...</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/hnpham_icon.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">HnPham</div><div class="author-info-description"></div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">37</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">21</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">攒了很多东西要买，但是没攒钱。</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Rabbitmq%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="toc-number">1.</span> <span class="toc-text">Rabbitmq的基本概念</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Queue%EF%BC%88%E9%98%9F%E5%88%97%EF%BC%89"><span class="toc-number">1.1.</span> <span class="toc-text">Queue（队列）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Message-acknowledgment%EF%BC%88%E6%B6%88%E6%81%AF%E5%9B%9E%E6%89%A7%EF%BC%89"><span class="toc-number">1.2.</span> <span class="toc-text">Message acknowledgment（消息回执）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Message-durability"><span class="toc-number">1.3.</span> <span class="toc-text">Message durability</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Prefetch-count"><span class="toc-number">1.4.</span> <span class="toc-text">Prefetch count</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Exchange"><span class="toc-number">1.5.</span> <span class="toc-text">Exchange</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Exchange-Type"><span class="toc-number">1.6.</span> <span class="toc-text">Exchange Type</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#fanout"><span class="toc-number">1.6.1.</span> <span class="toc-text">fanout</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#direct"><span class="toc-number">1.6.2.</span> <span class="toc-text">direct</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#topic"><span class="toc-number">1.6.3.</span> <span class="toc-text">topic</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#headers"><span class="toc-number">1.6.4.</span> <span class="toc-text">headers</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Binding"><span class="toc-number">1.7.</span> <span class="toc-text">Binding</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Binding-Key"><span class="toc-number">1.8.</span> <span class="toc-text">Binding Key</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Routing-Key%EF%BC%88%E7%94%9F%E4%BA%A7%E8%80%85%E5%8F%91%E9%80%81%E4%BF%A1%E6%81%AF%E6%97%B6%E6%8C%87%E5%AE%9A%EF%BC%8C%E9%80%9A%E5%B8%B8%E6%83%85%E5%86%B5%E4%B8%8B%EF%BC%8Cdirect%EF%BC%8Ctopic%E7%B1%BB%E5%9E%8B%E7%9A%84%E4%BA%A4%E6%8D%A2%E6%9C%BA%EF%BC%8C%E5%A6%82%E6%9E%9CRouting-Key%E5%92%8CBinding-Key%E5%8C%B9%E9%85%8D%EF%BC%8C%E5%88%99%E8%AF%A5%E9%98%9F%E5%88%97%E5%B0%B1%E4%BC%9A%E8%8E%B7%E5%8F%96%E8%AF%A5%E6%B6%88%E6%81%AF%EF%BC%89"><span class="toc-number">1.9.</span> <span class="toc-text">Routing Key（生产者发送信息时指定，通常情况下，direct，topic类型的交换机，如果Routing Key和Binding Key匹配，则该队列就会获取该消息）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#RPC"><span class="toc-number">1.9.1.</span> <span class="toc-text">RPC</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Virtual-hosts"><span class="toc-number">1.9.2.</span> <span class="toc-text">Virtual hosts</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%89%E8%A3%85RabbitMQ"><span class="toc-number">2.</span> <span class="toc-text">安装RabbitMQ</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85Erlang"><span class="toc-number">2.1.</span> <span class="toc-text">源码安装Erlang</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#rpm%E5%AE%89%E8%A3%85Erlang"><span class="toc-number">2.2.</span> <span class="toc-text">rpm安装Erlang</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%89%E8%A3%85%E5%92%8C%E4%BD%BF%E7%94%A8rabbitmq"><span class="toc-number">2.3.</span> <span class="toc-text">安装和使用rabbitmq</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B6%88%E6%81%AF%E5%9B%9E%E8%B0%83"><span class="toc-number">2.4.</span> <span class="toc-text">消息回调</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/08/24/online-compiler/" title="在线编译器">在线编译器</a><time datetime="2025-08-24T11:43:51.939Z" title="发表于 2025-08-24 19:43:51">2025-08-24</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2019/09/28/why-lamda-needs-final/" title="为什么lambda需要final">为什么lambda需要final</a><time datetime="2019-09-28T09:22:24.000Z" title="发表于 2019-09-28 17:22:24">2019-09-28</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2019/08/16/CORS/" title="跨源请求">跨源请求</a><time datetime="2019-08-16T06:17:53.000Z" title="发表于 2019-08-16 14:17:53">2019-08-16</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2019/06/07/java-oop/" title="java OOP">java OOP</a><time datetime="2019-06-07T01:07:21.000Z" title="发表于 2019-06-07 09:07:21">2019-06-07</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2019/06/02/java-generics/" title="java泛型">java泛型</a><time datetime="2019-06-02T01:07:21.000Z" title="发表于 2019-06-02 09:07:21">2019-06-02</time></div></div></div></div></div></div></main><footer id="footer" style="background: orange;"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2019 - 2025 By HnPham</span></div><div class="footer_custom_text">人最应做的是生活 而非生存</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"></div><canvas class="fireworks" mobile="false"></canvas><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/fireworks.min.js"></script><script defer="defer" id="ribbon" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-ribbon.min.js" size="150" alpha="0.6" zIndex="-1" mobile="false" data-click="false"></script><script defer="defer" id="fluttering_ribbon" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-fluttering-ribbon.min.js"></script></div></body></html>
